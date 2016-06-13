@@ -25,3 +25,4 @@ project/plugins/project/
 *.iws
 *.iml
 out/
+/bin/

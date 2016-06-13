@@ -37,13 +37,22 @@ object DataPreProcessing {
     }
   }
 
-  private def getDataFrame(sqlContext: SQLContext, sourceFilePath: String): DataFrame =
+  private def getDataFrame(sqlContext: SQLContext, sourceFilePath: String): DataFrame ={
+    
+ /* {"event":"AAA", "timestamp":"2015-06-10 12:54:43"}
+    {"event":"AAA", "timestamp":"2015-06-10 12:54:43"}
+    {"event":"AAA", "timestamp":"2015-06-10 14:54:43"} 
+    {"event":"ZZZ", "timestamp":"2015-06-25 12:54:43"}
+    {"event":"ZZZ", "timestamp":"2015-06-25 12:54:53"}*/
+    
     sqlContext.read.json(sourceFilePath)
       .withColumn("year", yearCol("timestamp"))
       .withColumn("month", monthCol("timestamp"))
       .withColumn("day", dayCol("timestamp"))
       .withColumn("hour", hourCol("timestamp"))
       .withColumn("minute", minuteCol("timestamp"))
+      
+  }
 
   //partitionBy is forcing me to add additional columns to the dataset (all the partition keys).
   //Find out if there is an easy way to avoid that

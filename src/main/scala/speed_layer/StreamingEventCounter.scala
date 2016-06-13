@@ -18,8 +18,9 @@ object StreamingEventCounter {
     test.PrepareDatabase.prepareRealTimeDatabase(Environment.CASSANDRA.HOST)
 
     val ssc = Environment.SPARK.newStreamingContext("StreamingEventCounter", Seconds(1))
-
-    getStream(ssc).map { case (key, value) => value }.foreachRDD(rdd => {
+    val inputStream:InputDStream[(String, String)]=getStream(ssc);
+    //From InputStream, each message will be an RDD so you can see foreachRDD will give an RDD from input stream
+    inputStream.map { case (key, value) => value }.foreachRDD(rdd => {
       measureTime {
         if (!rdd.isEmpty()) processMessagesRdd(rdd, new SQLContext(ssc.sparkContext))
       }
@@ -30,7 +31,15 @@ object StreamingEventCounter {
   }
 
   def processMessagesRdd(rdd: RDD[String], sqlContext: SQLContext) = {
+    
+    // Processing JSON RDD and converting it to RDD
     val df = sqlContext.read.json(rdd)
+    
+/*  {"event":"AAA", "timestamp":"2015-06-10 12:54:43"}
+    {"event":"AAA", "timestamp":"2015-06-10 12:54:43"}
+    {"event":"AAA", "timestamp":"2015-06-10 14:54:43"} 
+    {"event":"ZZZ", "timestamp":"2015-06-25 12:54:43"}
+    {"event":"ZZZ", "timestamp":"2015-06-25 12:54:53"}*/
 
     println("Aggregating by minute...")
     val eventsPerMinute = df.groupBy(col("event"), bucketStartDateCol(BucketTypes.minute, "timestamp") as "bdate").count().cache()

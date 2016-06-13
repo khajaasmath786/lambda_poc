@@ -11,6 +11,28 @@ Poc for a lambda architecture using Kafka, Flume, Spark, Cassandra, HDFS
 * Kafka 0.9.0.0
 * Flume 1.6.0
 
+----------------------
+SBT
+Download source code into local folder. Navigate to that folder and run command. $ sbt eclipse with-source=true
+You might get errors with with-source=true, but ignore that and import project in eclipse as File --> Import -->General -->  Existing project into workspace
+if you want to add few more entries in SBT, then add in local and execute below commands
+sbt reload
+sbt eclipse with-source=true
+Hit F5 or refresh project
+-----------------------------------------------------------------
+
+Kafka with Flume. See the below URL for more details.
+https://www.cloudera.com/documentation/kafka/latest/topics/kafka_flume.html
+
+Data processed through kafka is stored into hdfs through flume or camus. In our case we are using flume.
+In this case for flume, source is kafka, channel is memory and sink is hdfs directory.
+Flume while adding data to hdfs, it will create with .tmp once finished it will change the name by removing .tmp
+It will be writing data to hdfs at /new_data/kafka/events_topic
+Check Environment.scala for correct information.
+check what does hdfs://localhost:9000/events directory contain .. This is deleted in batchpiple before making cassandra connections available. This acts as output directory 
+-----------------------------------------------------------------
+
+
 #Flume Config
 Create a conf file "lambdapoc_flume-conf.properties" and save it under the `conf` directory in the flume home
 
